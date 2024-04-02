@@ -1,0 +1,17 @@
+version: "3"
+services:
+  api_dev:
+    image: rafaelalves1936/insta_carro_back_end
+    ports:
+      - "3333:3030"
+    links:
+      - link-db
+  link-db:
+    image: bitnami/mongodb:latest
+    ports:
+      - "27017:27017"
+      - "27018:27018"
+    environment:
+      - AUTH=no
+  redis:
+    image: "redis"
