@@ -69,7 +69,7 @@ Para rodar localmente, você pode utilizar essas duas imagens Docker para MongoD
 
 docker run -d -p 27017:27017 -p 27018:27018 -e AUTH=no bitnami/mongodb:latest
 
-## Em seguida, inicie o Redis com o comando:
+Em seguida, inicie o Redis com o comando:
 
 docker run -d -p 6379:6379 redis.
 
