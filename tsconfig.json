@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "incremental": true,
+        "outDir": "dist",
+        "typeRoots": [
+            "../node_modules/@types",
+            "custom_types"
+        ]
+    },
+    "include": [
+        "**/*.ts",
+        "*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "buildOnSave": true,
+    "compileOnSave": true
+}
