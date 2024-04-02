@@ -6,8 +6,7 @@
         "incremental": true,
         "outDir": "dist",
         "typeRoots": [
-            "../node_modules/@types",
-            "custom_types"
+            "../node_modules/@types"
         ]
     },
     "include": [
