@@ -22,19 +22,21 @@ class bidsService {
     }
 
     async create(bids) {
-
-        const carWithAuctionEndDate = await carsRepository.find({ '_id': bids.car, auctionEndDate: { $exists: true } });
-
-        if (carWithAuctionEndDate.length > 0) {
-
-            return [{ message :  'Não é possível adicionar o lance porque o leilão deste carro já se encontra finalizado.' }];
-
-        } else {
-
+       
+            const car = await carsRepository.findById(bids.car);
+    
+            if (!car) {
+                return [{ message: 'Carro não encontrado.' }];
+            }
+    
+            const carWithAuctionEndDate = await carsRepository.findOne({ '_id': bids.car, auctionEndDate: { $exists: true } });
+    
+            if (carWithAuctionEndDate) {
+                return [{ message: 'Não é possível adicionar o lance porque o leilão deste carro já se encontra finalizado.' }];
+            }
+    
             return await bidsRepository.create(bids);
-
-        }
-
+       
     }
 
     async update(_id, bids) {

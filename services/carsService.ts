@@ -3,9 +3,12 @@ import carsRepository from "../repository/carsRepository";
 class CarService {
 
     async get(page, perPage) {
-        return await carsRepository.find({})
-            .skip((page - 1) * perPage)
-            .limit(perPage);
+         
+        const cars = await carsRepository.find({})
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+
+        return cars.slice(start, end);
     }
 
     async getById(_id) {
