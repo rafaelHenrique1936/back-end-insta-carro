@@ -2,7 +2,7 @@ import bidService from '../services/bidsService';
 import bidsRepository from '../repository/bidsRepository';
 import { expect, jest, describe, it, } from '@jest/globals';
 import { Bid } from '../models/bidsSchema';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 import BidModel from '../repository/bidsRepository';
 
 

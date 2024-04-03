@@ -20,7 +20,7 @@ class UsersController {
                 } else {
                     const result = await UsersService.get(page, limit);
                     redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 3600);
+                    redis.expire(chave, 10);
                     Helper.sendResponse(res, HttpStatus.OK, result);
                 }
             });
@@ -40,7 +40,7 @@ class UsersController {
                 } else {
                     const result = await UsersService.getById(_id);
                     redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 3600);
+                    redis.expire(chave, 10);
                     Helper.sendResponse(res, HttpStatus.OK, result);
                 }
             });

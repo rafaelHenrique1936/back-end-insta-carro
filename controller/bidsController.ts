@@ -18,7 +18,7 @@ class BidsController {
             } else {
                 const result = await BidsService.getById(_id);
                 redis.set(chave, JSON.stringify(result));
-                redis.expire(chave, 3600);
+                redis.expire(chave, 10);
                 Helper.sendResponse(res, HttpStatus.OK, result);
             }
         } catch (error) {

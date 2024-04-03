@@ -20,7 +20,7 @@ class CarsController {
             } else {
                 const result = await CarsService.get(page, limit);
                 redis.set(chave, JSON.stringify(result));
-                redis.expire(chave, 3600);
+                redis.expire(chave, 10);
                 Helper.sendResponse(res, HttpStatus.OK, result);
             }
         } catch (error) {
@@ -39,7 +39,7 @@ class CarsController {
             } else {
                 const result = await CarsService.getById(_id);
                 redis.set(chave, JSON.stringify(result));
-                redis.expire(chave, 3600);
+                redis.expire(chave, 10);
                 Helper.sendResponse(res, HttpStatus.OK, result);
             }
         } catch (error) {
