@@ -1,117 +1,88 @@
 import * as HttpStatus from 'http-status';
 import Redis from 'ioredis';
-
 import Helper from "../infra/helper";
-import usersService from "../services/usersService";
+import UsersService from "../services/usersService";
 
 const redis = new Redis();
 
 class UsersController {
-
-    async get(req, res) {
-
+   
+    async get(req: any, res: any): Promise<void> {
         try {
-
             const chave = `room:users`;
-            let {page, limit} = req.query;
+            let { page, limit } = req.query;
             page = page ? parseInt(page) : 1;
             limit = limit ? parseInt(limit) : 10;
 
-            await redis.get(chave, async function (err, reply) {
+            await redis.get(chave, async function (err: any, reply: any) {
                 if (reply) {
                     Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
                 } else {
-                    let result = await usersService.get(page, limit);
-                    redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 20);
-                    Helper.sendResponse(res, HttpStatus.OK, result);
-                }
-            });
-
-
-        } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
-        }
-
-    }
-
-    async getById(req, res) {
-
-        try {
-
-            const _id = req.params.id;
-
-            const chave = `room:${_id}`;
-
-            await redis.get(chave, async function (err, reply) {
-                if (reply) {
-                    Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
-                } else {
-                    let result = await usersService.getById(_id);
+                    const result = await UsersService.get(page, limit);
                     redis.set(chave, JSON.stringify(result));
                     redis.expire(chave, 3600);
                     Helper.sendResponse(res, HttpStatus.OK, result);
                 }
             });
-
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async create(req, res) {
-
+    async getById(req: any, res: any): Promise<void> {
         try {
+            const _id = req.params.id;
+            const chave = `room:${_id}`;
 
-            let user = req.body;
+            await redis.get(chave, async function (err: any, reply: any) {
+                if (reply) {
+                    Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
+                } else {
+                    const result = await UsersService.getById(_id);
+                    redis.set(chave, JSON.stringify(result));
+                    redis.expire(chave, 3600);
+                    Helper.sendResponse(res, HttpStatus.OK, result);
+                }
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
 
-            const result = await usersService.create(user);
+    async create(req: any, res: any): Promise<void> {
+        try {
+            const user = req.body;
+            const result = await UsersService.create(user);
             Helper.sendResponse(res, HttpStatus.OK, 'Registro incluído com Sucesso!');
-
         } catch (error) {
-
-            console.error('Erro ao incluir informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async update(req, res) {
-
+    async update(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-            let user = req.body;
-
-            let result = await usersService.update(_id, user);
+            const user = req.body;
+            const result = await UsersService.update(_id, user);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} alterado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao atualizar informação:', error.message);
-
+            this.handleError(res, error);
         }
-
     }
 
-    async delete(req, res) {
-
-
+    async delete(req: any, res: any): Promise<void> {
         try {
             const _id = req.params.id;
-
-            await usersService.delete(_id);
+            await UsersService.delete(_id);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} deletado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao deletar informação:', error.message);
-
+            this.handleError(res, error);
         }
+    }
 
+    private handleError(res: any, error: Error): void {
+        console.error('Erro:', error.message);
+        Helper.sendResponse(res, HttpStatus.INTERNAL_SERVER_ERROR, 'Erro interno no servidor');
     }
 }
 

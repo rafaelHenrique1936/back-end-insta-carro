@@ -3,12 +3,12 @@ import bidsController from "../controller/bidsController";
 
 const bidsRoute = express.Router();
 
-bidsRoute.route("/api/v1/bids/car/:id").get(bidsController.getByCar);
-bidsRoute.route("/api/v1/bids/car/:id/last").get(bidsController.getLastId);
-bidsRoute.route("/api/v1/bids/user/:id").get(bidsController.getByUser);
-bidsRoute.route("/api/v1/bids/:id").get(bidsController.getById);
-bidsRoute.route("/api/v1/bids").post(bidsController.create);
-bidsRoute.route("/api/v1/bids/:id").put(bidsController.update);
-bidsRoute.route("/api/v1/bids/:id").delete(bidsController.delete);
+bidsRoute.get("/api/v1/bids/car/:id", bidsController.getByCar);
+bidsRoute.get("/api/v1/bids/car/:id/last", bidsController.getLastId);
+bidsRoute.get("/api/v1/bids/user/:id", bidsController.getByUser);
+bidsRoute.get("/api/v1/bids/:id", bidsController.getById);
+bidsRoute.post("/api/v1/bids", bidsController.create);
+bidsRoute.put("/api/v1/bids/:id", bidsController.update);
+bidsRoute.delete("/api/v1/bids/:id", bidsController.delete);
 
 export default bidsRoute;

@@ -1,29 +1,16 @@
-import carService from '../services/carsService';
 import carsRepository from '../repository/carsRepository';
-import { expect, jest, describe, it, } from '@jest/globals';
+import carService from '../services/carsService';
+import { expect, jest, describe, it } from '@jest/globals';
+import { Car } from '../models/carsSchema';
+import CarModel from '../repository/carsRepository';
 
-interface ICar {
-    brand: String,
-    models: String,
-    year: Number,
-    mileage: Number,
-    price: Number,
-    minimumPrice: Number,
-    transmission: String,
-    fuelType: String,
-    engineSize: Number,
-    numOfSeats: Number,
-    numOfDoors: Number,
-    color: String,
-    condition: String,
-    features: String,
-}
 
 jest.mock('../repository/carsRepository');
-const generateMockCars = (count: number): ICar[] => {
-    const mockCars: ICar[] = [];
+
+const generateMockCars = (count: number): Car[] => {
+    const mockCars: Car[] = [];
     for (let i = 0; i < count; i++) {
-        mockCars.push({
+        const newCar = new CarModel({
             brand: "Toyota",
             models: "Corolla Cross",
             year: 2021,
@@ -39,25 +26,27 @@ const generateMockCars = (count: number): ICar[] => {
             condition: "Usado",
             features: "GPS, Bancos em Couro"
         });
+        mockCars.push(newCar);
     }
     return mockCars;
 };
 
+
+
 describe('carService', () => {
     describe('get', () => {
-        it('deve retornar uma lista de carros paginada', async () => {
+        it('should return a paginated list of cars', async () => {
             const page = 1;
             const perPage = 10;
 
-            const mockCars: ICar[] = generateMockCars(10);
+            const mockCars: Car[] = generateMockCars(10);
             (carsRepository.find as jest.Mock).mockReturnValue(mockCars);
+
             const result = await carService.get(page, perPage);
             expect(result).toEqual(mockCars);
         });
-    });
 
-    describe('get', () => {
-        it('deve retornar erro em caso de falha na busca da lista de carros paginada', async () => {
+        it('should throw an error when failing to fetch a paginated list of cars', async () => {
             const page = 1;
             const perPage = 10;
 
@@ -69,23 +58,19 @@ describe('carService', () => {
         });
     });
 
-
     describe('getById', () => {
-        it('deve retornar um carros pelo ID', async () => {
-
+        it('should return a car by ID', async () => {
             const carId = '123456';
 
-            const mockCars: ICar[] = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
             (carsRepository.findById as jest.Mock).mockReturnValue(mockCars);
 
             const result = await carService.getById(carId);
 
             expect(result).toEqual(mockCars);
         });
-    });
 
-    describe('getById', () => {
-        it('deve retornar error ao não conseguir buscar um carros pelo ID', async () => {
+        it('should throw an error when failing to fetch a car by ID', async () => {
             const carId = '123456';
 
             (carsRepository.findById as jest.Mock).mockImplementationOnce(() => {
@@ -97,57 +82,53 @@ describe('carService', () => {
     });
 
     describe('create', () => {
-        it('deve criar um novo carros', async () => {
-            const mockCars: ICar[] = generateMockCars(1);
+        it('should create a new car', async () => {
+            const mockCars: Car[] = generateMockCars(1);
             (carsRepository.create as jest.Mock).mockReturnValue(mockCars[0]);
 
             const result = await carService.create(mockCars[0]);
 
             expect(result).toEqual(mockCars[0]);
         });
-    });
 
-    describe('create', () => {
-        it('deve retornar error ao não coseguir criar um novo carros', async () => {
+        it('should throw an error when failing to create a new car', async () => {
 
-            const mockCar = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
 
             (carsRepository.create as jest.Mock).mockImplementationOnce(() => {
                 throw new Error('Erro ao criar novo carros');
             });
 
-            await expect(carService.create(mockCar)).rejects.toThrow('Erro ao criar novo carros');
+            await expect(carService.create(mockCars[0])).rejects.toThrow('Erro ao criar novo carros');
         });
     });
 
     describe('update', () => {
-        it('deve atualizar um carros existente', async () => {
+        it('should update an existing car', async () => {
             const carId = '123456';
-            const mockCars: ICar[] = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
 
             (carsRepository.findByIdAndUpdate as jest.Mock).mockReturnValue(mockCars[0]);
 
             const result = await carService.update(carId, mockCars[0]);
             expect(result).toEqual(mockCars[0]);
         });
-    });
 
-    describe('update', () => {
-        it('deve retornar erro ao não conseguir atualizar um carros existente', async () => {
+        it('should throw an error when failing to update an existing car', async () => {
             const carId = '123456';
-            const mockCar = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
+
 
             (carsRepository.findByIdAndUpdate as jest.Mock).mockImplementationOnce(() => {
                 throw new Error('Erro ao atualizar carros');
             });
 
-            await expect(carService.update(carId, mockCar)).rejects.toThrow('Erro ao atualizar carros');
+            await expect(carService.update(carId, mockCars[0])).rejects.toThrow('Erro ao atualizar carros');
         });
     });
 
-
     describe('delete', () => {
-        it('deve excluir um carros pelo ID', async () => {
+        it('should delete a car by ID', async () => {
             const carId = '123456';
 
             (carsRepository.findByIdAndDelete as jest.Mock).mockReturnValue(carId);
@@ -155,10 +136,8 @@ describe('carService', () => {
             const result = await carService.delete(carId);
             expect(result).toEqual(carId);
         });
-    });
 
-    describe('delete', () => {
-        it('deve retornar erro ao não conseguir excluir um carros pelo ID', async () => {
+        it('should throw an error when failing to delete a car by ID', async () => {
             const carId = '123456';
 
             (carsRepository.findByIdAndDelete as jest.Mock).mockImplementationOnce(() => {
@@ -170,29 +149,25 @@ describe('carService', () => {
     });
 
     describe('finishBids', () => {
-        it('deve atualizar um carro para que seu status de leilão seja finalizado', async () => {
+        it('should update a car to finish its auction status', async () => {
             const carId = '123456';
-            const mockCars: ICar[] = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
 
             (carsRepository.findByIdAndUpdate as jest.Mock).mockReturnValue(mockCars[0]);
 
             const result = await carService.update(carId, mockCars[0]);
             expect(result).toEqual(mockCars[0]);
         });
-    });
 
-    describe('finishBids', () => {
-        it('deve retornar um error ao tentar atualizar um carro para que seu status de leilão seja finalizado', async () => {
+        it('should throw an error when failing to update a car to finish its auction status', async () => {
             const carId = '123456';
-            const mockCar = generateMockCars(1);
+            const mockCars: Car[] = generateMockCars(1);
 
             (carsRepository.findByIdAndUpdate as jest.Mock).mockImplementationOnce(() => {
                 throw new Error('Erro ao finalizar leilão do carro');
             });
 
-            await expect(carService.update(carId, mockCar)).rejects.toThrow('Erro ao finalizar leilão do carro');
+            await expect(carService.update(carId, mockCars[0])).rejects.toThrow('Erro ao finalizar leilão do carro');
         });
     });
-
-
 });

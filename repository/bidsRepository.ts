@@ -1,4 +1,6 @@
-import * as mongoose from 'mongoose';
-import bidsSchema from '../models/bidsSchema';
+import mongoose, { Model } from 'mongoose';
+import bidsSchema, { Bid } from '../models/bidsSchema';
 
-export default mongoose.model('bids', bidsSchema);
+const BidModel: Model<Bid> = mongoose.model('bids', bidsSchema);
+
+export default BidModel;

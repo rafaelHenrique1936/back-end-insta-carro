@@ -1,145 +1,96 @@
 import * as HttpStatus from 'http-status';
 import Redis from 'ioredis';
-
 import Helper from "../infra/helper";
-import bidsService from "../services/bidsService";
+import BidsService from "../services/bidsService";
 
 const redis = new Redis();
 
 class BidsController {
-
-
-    async getById(req, res) {
-
+   
+    async getById(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
             const chave = `room:${_id}`;
 
-            await redis.get(chave, async function (err, reply) {
-                if (reply) {
-                    Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
-                } else {
-                    let result = await bidsService.getById(_id);
-                    redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 20);
-                    Helper.sendResponse(res, HttpStatus.OK, result);
-                }
-            });
-
+            const cachedBid = await redis.get(chave);
+            if (cachedBid) {
+                Helper.sendResponse(res, HttpStatus.OK, JSON.parse(cachedBid));
+            } else {
+                const result = await BidsService.getById(_id);
+                redis.set(chave, JSON.stringify(result));
+                redis.expire(chave, 3600);
+                Helper.sendResponse(res, HttpStatus.OK, result);
+            }
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async getByCar(req, res) {
-
+    async getByCar(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
-            let result = await bidsService.getByCar(_id);
-
+            const result = await BidsService.getByCar(_id);
             Helper.sendResponse(res, HttpStatus.OK, result);
-
-
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async getByUser(req, res) {
-
+    async getByUser(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
-            let result = await bidsService.getByUser(_id);
-
+            const result = await BidsService.getByUser(_id);
             Helper.sendResponse(res, HttpStatus.OK, result);
-
-
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async getLastId(req, res) {
-
+    async getLastId(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
-            let result = await bidsService.getLastId(_id);
-
+            const result = await BidsService.getLastBidByCar(_id);
             Helper.sendResponse(res, HttpStatus.OK, result);
-
-
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async create(req, res) {
-
+    async create(req: any, res: any): Promise<void> {
         try {
-
-            let bids = req.body;
-            let message : String; 
-
-            let result = await bidsService.create(bids);
-            message = result[0]?.message ? result[0]?.message : 'Registro incluído com Sucesso!';
+            const bids = req.body;
+            const result = await BidsService.create(bids);
+            const message = result[0]?.message || 'Registro incluído com Sucesso!';
             Helper.sendResponse(res, HttpStatus.OK, message);
-
         } catch (error) {
-
-            console.error('Erro ao incluir informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async update(req, res) {
-
+    async update(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-            let bids = req.body;
-
-            let result = await bidsService.update(_id, bids);
+            const bids = req.body;
+            const result = await BidsService.update(_id, bids);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} alterado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao atualizar informação:', error.message);
-
+            this.handleError(res, error);
         }
-
     }
 
-    async delete(req, res) {
-
-
+    async delete(req: any, res: any): Promise<void> {
         try {
             const _id = req.params.id;
-
-            await bidsService.delete(_id);
+            await BidsService.delete(_id);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} deletado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao deletar informação:', error.message);
-
+            this.handleError(res, error);
         }
+    }
 
+    private handleError(res: any, error: Error): void {
+        console.error('Erro:', error.message);
+        Helper.sendResponse(res, HttpStatus.INTERNAL_SERVER_ERROR, 'Erro interno no servidor');
     }
 }
 
