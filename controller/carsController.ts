@@ -1,138 +1,97 @@
 import * as HttpStatus from 'http-status';
 import Redis from 'ioredis';
-
 import Helper from "../infra/helper";
-import carsService from "../services/carsService";
-import bidsService from '../services/bidsService';
+import CarsService from "../services/carsService";
+import BidsService from '../services/bidsService';
 
 const redis = new Redis();
 
 class CarsController {
+   
 
-    async get(req, res) {
-
+    async get(req: any, res: any): Promise<void> {
         try {
-
+            const { page = 1, limit = 10 } = req.query;
             const chave = `room:cars`;
-            let {page, limit} = req.query;
-            page = page ? parseInt(page) : 1;
-            limit = limit ? parseInt(limit) : 10;
 
-            await redis.get(chave, async function (err, reply) {
-                if (reply) {
-                    Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
-                } else {
-                    let result = await carsService.get(page, limit);
-                    redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 20);
-                    Helper.sendResponse(res, HttpStatus.OK, result);
-                }
-            });
-
-
+            const cachedCars = await redis.get(chave);
+            if (cachedCars) {
+                Helper.sendResponse(res, HttpStatus.OK, JSON.parse(cachedCars));
+            } else {
+                const result = await CarsService.get(page, limit);
+                redis.set(chave, JSON.stringify(result));
+                redis.expire(chave, 3600);
+                Helper.sendResponse(res, HttpStatus.OK, result);
+            }
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
-
     }
 
-    async getById(req, res) {
-
+    async getById(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
             const chave = `room:${_id}`;
 
-            await redis.get(chave, async function (err, reply) {
-                if (reply) {
-                    Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
-                } else {
-                    let result = await carsService.getById(_id);
-                    redis.set(chave, JSON.stringify(result));
-                    redis.expire(chave, 3600);
-                    Helper.sendResponse(res, HttpStatus.OK, result);
-                }
-            });
-
+            const cachedCar = await redis.get(chave);
+            if (cachedCar) {
+                Helper.sendResponse(res, HttpStatus.OK, JSON.parse(cachedCar));
+            } else {
+                const result = await CarsService.getById(_id);
+                redis.set(chave, JSON.stringify(result));
+                redis.expire(chave, 3600);
+                Helper.sendResponse(res, HttpStatus.OK, result);
+            }
         } catch (error) {
-
-            console.error('Erro ao buscar informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async create(req, res) {
-
+    async create(req: any, res: any): Promise<void> {
         try {
-
-            let car = req.body;
-
-            await carsService.create(car);
+            const car = req.body;
+            await CarsService.create(car);
             Helper.sendResponse(res, HttpStatus.OK, 'Registro incluído com Sucesso!');
-
         } catch (error) {
-
-            console.error('Erro ao incluir informação:', error.message);
-
+            this.handleError(res, error);
         }
     }
 
-    async update(req, res) {
-
+    async update(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-            let car = req.body;
-
-            let result = await carsService.update(_id, car);
+            const car = req.body;
+            await CarsService.update(_id, car);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} alterado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao atualizar informação:', error.message);
-
+            this.handleError(res, error);
         }
-
     }
 
-    async finishBids(req, res) {
-
+    async finishBids(req: any, res: any): Promise<void> {
         try {
-
             const _id = req.params.id;
-
-            let finishBids = await carsService.finishBids(_id);
-
-            let result = await bidsService.getLastId(_id);
-
+            await CarsService.finishBids(_id);
+            const result = await BidsService.getLastBidByCar(_id);
             Helper.sendResponse(res, HttpStatus.OK, result);
-
         } catch (error) {
-
-            console.error('Erro ao atualizar informação:', error.message);
-
+            this.handleError(res, error);
         }
-
     }
 
-    async delete(req, res) {
-
-
+    async delete(req: any, res: any): Promise<void> {
         try {
             const _id = req.params.id;
-
-            await carsService.delete(_id);
+            await CarsService.delete(_id);
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} deletado com Sucesso!`);
-
         } catch (error) {
-
-            console.error('Erro ao deletar informação:', error.message);
-
+            this.handleError(res, error);
         }
+    }
 
+    private handleError(res: any, error: Error): void {
+        console.error('Erro:', error.message);
+        Helper.sendResponse(res, HttpStatus.INTERNAL_SERVER_ERROR, 'Erro interno no servidor');
     }
 }
 

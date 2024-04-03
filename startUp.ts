@@ -55,7 +55,7 @@ class StartUp {
             graphiql: true
         }))
 
-        this.app.use(Auth.validade);
+        this.app.use(Auth.validate);
 
         this.app.use('/', carsRoute);
         this.app.use('/', usersRoute);

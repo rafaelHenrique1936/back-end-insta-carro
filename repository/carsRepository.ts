@@ -1,3 +1,6 @@
-import * as mongoose from 'mongoose';
-import carsSchema from '../models/carsSchema';
-export default mongoose.model('cars', carsSchema);
+import mongoose, { Model } from 'mongoose';
+import carsSchema, { Car } from '../models/carsSchema';
+
+const CarModel: Model<Car> = mongoose.model<Car>('cars', carsSchema);
+
+export default CarModel;

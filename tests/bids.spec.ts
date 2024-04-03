@@ -1,45 +1,40 @@
 import bidService from '../services/bidsService';
 import bidsRepository from '../repository/bidsRepository';
 import { expect, jest, describe, it, } from '@jest/globals';
-const mongoose = require('mongoose');
+import { Bid } from '../models/bidsSchema';
+import mongoose, { Types } from 'mongoose';
+import BidModel from '../repository/bidsRepository';
 
-interface IBid {
-    user: String,
-    car: String,
-    amount: Number
-}
 
 jest.mock('../repository/bidsRepository');
-const generateMockBids = (count: number): IBid[] => {
-    const mockBids: IBid[] = [];
+
+const generateMockBids = (count: number): Bid[] => {
+    const mockBids: Bid[] = [];
     for (let i = 0; i < count; i++) {
-        mockBids.push({
+        const newBid = new BidModel({
             user: new mongoose.Types.ObjectId('5f28f414c88c640a6096c2aa'),
             car: new mongoose.Types.ObjectId('5f28f414c88c640a6096c2bb'),
             amount: 10000
         });
+        mockBids.push(newBid);
     }
     return mockBids;
 };
-
-describe('bidService', () => {
-
+describe('Bid Service', () => {
     describe('update', () => {
-        it('deve atualizar um lance existente', async () => {
+        it('should update an existing bid', async () => {
             const bidId = '123456';
-            const mockBids: IBid[] = generateMockBids(1);
+            const mockBids: Bid[] = generateMockBids(1);
 
             (bidsRepository.findByIdAndUpdate as jest.Mock).mockReturnValue(mockBids[0]);
 
             const result = await bidService.update(bidId, mockBids[0]);
             expect(result).toEqual(mockBids[0]);
         });
-    });
 
-    describe('update', () => {
-        it('deve retornar erro ao não conseguir atualizar um lance existente', async () => {
+        it('should throw an error when failing to update an existing bid', async () => {
             const bidId = '123456';
-            const mockBid = generateMockBids(1);
+            const mockBid = generateMockBids(1)[0];
 
             (bidsRepository.findByIdAndUpdate as jest.Mock).mockImplementationOnce(() => {
                 throw new Error('Erro ao atualizar lance');
@@ -49,9 +44,8 @@ describe('bidService', () => {
         });
     });
 
-
     describe('delete', () => {
-        it('deve excluir um lance pelo ID', async () => {
+        it('should delete a bid by ID', async () => {
             const bidId = '123456';
 
             (bidsRepository.findByIdAndDelete as jest.Mock).mockReturnValue(bidId);
@@ -59,10 +53,8 @@ describe('bidService', () => {
             const result = await bidService.delete(bidId);
             expect(result).toEqual(bidId);
         });
-    });
 
-    describe('delete', () => {
-        it('deve retornar erro ao não conseguir excluir um lance pelo ID', async () => {
+        it('should throw an error when failing to delete a bid by ID', async () => {
             const bidId = '123456';
 
             (bidsRepository.findByIdAndDelete as jest.Mock).mockImplementationOnce(() => {
@@ -72,5 +64,4 @@ describe('bidService', () => {
             await expect(bidService.delete(bidId)).rejects.toThrow('Erro ao excluir lance');
         });
     });
-
 });

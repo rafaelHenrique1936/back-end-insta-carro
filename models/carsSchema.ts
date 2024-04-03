@@ -1,6 +1,24 @@
-import * as mongoose from 'mongoose';
+import { Schema, Document } from 'mongoose';
 
-const carsSchema = new mongoose.Schema({
+export interface Car extends Document {
+    brand: string;
+    models: string;
+    year: number;
+    mileage: number;
+    price: number;
+    minimumPrice: number;
+    transmission: string;
+    fuelType: string;
+    engineSize: number;
+    numOfSeats: number;
+    numOfDoors: number;
+    color: string;
+    condition: string;
+    features: string;
+    auctionEndDate?: Date;
+}
+
+const carsSchema: Schema<Car> = new Schema<Car>({
     brand: { type: String, required: true },
     models: { type: String, required: true },
     year: { type: Number, required: true },
@@ -15,8 +33,7 @@ const carsSchema = new mongoose.Schema({
     color: { type: String, required: true },
     condition: { type: String, required: true },
     features: { type: String, required: true }, 
-    auctionEndDate: { type: Date, index: true  }, 
-
-})
+    auctionEndDate: { type: Date, index: true }
+});
 
 export default carsSchema;

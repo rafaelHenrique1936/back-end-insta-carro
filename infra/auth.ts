@@ -1,29 +1,27 @@
 import * as jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 import Configs from './configs';
 
 class Auth {
+    public validate(req: Request, res: Response, next: NextFunction): void {
+        const token = req.headers['x-access-token'] as string;
 
-    validade(req, res, next) {
-
-        var token = req.headers['x-access-token'];
-
-        if (token) {
-            jwt.verify(token, Configs.secret, function (err, decoded) {
-
+        if (!token) {
+            res.status(401).send({
+                success: false,
+                message: '401 - Unauthorized'
+            });
+        } else {
+            jwt.verify(token, Configs.secret, (err, decoded) => {
                 if (err) {
-                    return res.status(403).send({
+                    res.status(403).send({
                         success: false,
                         message: '403 - Token Inválido'
-                    })
+                    });
                 } else {
                     next();
                 }
-            })
-        } else {
-            return res.status(401).send({
-                success: false,
-                message: '401 - unauthorized'
-            })
+            });
         }
     }
 }

@@ -74,3 +74,35 @@ Em seguida, inicie o Redis com o comando:
 docker run -d -p 6379:6379 redis.
 
 Por fim, é necessário alterar o link de conexão no arquivo `db.ts`. Descomente a opção que deseja utilizar local ou conteinerizado.
+
+## Melhorias Futuras
+
+Se tivesse mais tempo, algumas melhorias poderiam ser implementadas no projeto:
+
+- **Melhoria na Paginação:**
+
+Refinar a lógica de paginação para melhorar a eficiência e resolver problemas relacionados aos testes de paginação com consultas ao banco de dados.
+
+- **Tratamento de Erros Aprimorado:** 
+
+Implementar um tratamento de erros mais robusto e abrangente em todas as partes do código para lidar com situações inesperadas de forma mais elegante e informativa.
+
+- **Validações Adicionais:**
+
+ Adicionar mais validações nos processos de criação e atualização de recursos para garantir a integridade dos dados e a segurança da aplicação.
+
+- **Documentação Expandida:**
+
+ Expandir a documentação do código-fonte para incluir mais detalhes sobre a arquitetura, padrões de design utilizados e fluxos de trabalho da aplicação.
+
+- **Melhorias de Desempenho:**
+
+ Identificar e resolver possíveis gargalos de desempenho na aplicação, otimizando consultas ao banco de dados, cacheamento de dados e outras operações críticas.
+
+- **Implementação de Testes de Integração:**
+
+ Desenvolver testes de integração para garantir que os diferentes componentes da aplicação funcionem bem juntos e que as integrações com APIs externas sejam robustas.
+
+- **Implementação de Funcionalidades Adicionais:**
+
+ Adicionar novas funcionalidades conforme necessário para atender aos requisitos do cliente ou melhorar a experiência do usuário na plataforma.

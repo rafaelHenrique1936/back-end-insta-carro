@@ -1,6 +1,15 @@
 class Configs {
-    secret = "dGVzdGVJbnN0YUNhcnJvUmFmYWVsSGVucmlxdWU=";
+    private _secret: string;
 
+    constructor(secret: string) {
+        this._secret = secret;
+    }
+
+    get secret(): string {
+        return this._secret;
+    }
 }
 
-export default new Configs;
+const defaultSecret = "dGVzdGVJbnN0YUNhcnJvUmFmYWVsSGVucmlxdWU=";
+
+export default new Configs(defaultSecret);

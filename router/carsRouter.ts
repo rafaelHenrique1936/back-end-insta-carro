@@ -3,11 +3,11 @@ import carsController from "../controller/carsController";
 
 const carsRoute = express.Router();
 
-carsRoute.route("/api/v1/cars").get(carsController.get);
-carsRoute.route("/api/v1/cars/:id").get(carsController.getById);
-carsRoute.route("/api/v1/cars").post(carsController.create);
-carsRoute.route("/api/v1/cars/:id").put(carsController.update);
-carsRoute.route("/api/v1/cars/:id/finishBids").put(carsController.finishBids);
-carsRoute.route("/api/v1/cars/:id").delete(carsController.delete);
+carsRoute.get("/api/v1/cars", carsController.get);
+carsRoute.get("/api/v1/cars/:id", carsController.getById);
+carsRoute.post("/api/v1/cars", carsController.create);
+carsRoute.put("/api/v1/cars/:id", carsController.update);
+carsRoute.put("/api/v1/cars/:id/finishBids", carsController.finishBids);
+carsRoute.delete("/api/v1/cars/:id", carsController.delete);
 
 export default carsRoute;
