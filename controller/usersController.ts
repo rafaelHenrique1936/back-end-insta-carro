@@ -69,7 +69,7 @@ class UsersController {
 
             let user = req.body;
 
-            await usersService.create(user);
+            const result = await usersService.create(user);
             Helper.sendResponse(res, HttpStatus.OK, 'Registro incluído com Sucesso!');
 
         } catch (error) {
