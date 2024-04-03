@@ -6,8 +6,7 @@ import BidsService from '../services/bidsService';
 
 const redis = new Redis();
 
-class CarsController {
-   
+class CarsController {   
 
     async get(req: any, res: any): Promise<void> {
         try {
@@ -19,6 +18,12 @@ class CarsController {
                 Helper.sendResponse(res, HttpStatus.OK, JSON.parse(cachedCars));
             } else {
                 const result = await CarsService.get(page, limit);
+
+                if (!result) {
+                    Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi encontrado!' });
+                    return;
+                };
+
                 redis.set(chave, JSON.stringify(result));
                 redis.expire(chave, 10);
                 Helper.sendResponse(res, HttpStatus.OK, result);
@@ -38,6 +43,12 @@ class CarsController {
                 Helper.sendResponse(res, HttpStatus.OK, JSON.parse(cachedCar));
             } else {
                 const result = await CarsService.getById(_id);
+
+                if (!result) {
+                    Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi encontrado!' });
+                    return;
+                };
+
                 redis.set(chave, JSON.stringify(result));
                 redis.expire(chave, 10);
                 Helper.sendResponse(res, HttpStatus.OK, result);
@@ -50,8 +61,14 @@ class CarsController {
     async create(req: any, res: any): Promise<void> {
         try {
             const car = req.body;
-            await CarsService.create(car);
-            Helper.sendResponse(res, HttpStatus.OK, 'Registro incluído com Sucesso!');
+            const result = await CarsService.create(car); 
+            
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi incluído!' });
+                return;
+            };
+
+            Helper.sendResponse(res, HttpStatus.CREATED, { body: result, message: 'Registro incluído com Sucesso!' });
         } catch (error) {
             this.handleError(res, error);
         }
@@ -61,8 +78,14 @@ class CarsController {
         try {
             const _id = req.params.id;
             const car = req.body;
-            await CarsService.update(_id, car);
-            Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} alterado com Sucesso!`);
+            const result = await CarsService.update(_id, car);
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi atualizado!' });
+                return;
+            };
+
+            Helper.sendResponse(res, HttpStatus.OK, { body: result, message: `Registro ${_id} alterado com Sucesso!` });
         } catch (error) {
             this.handleError(res, error);
         }
@@ -73,6 +96,12 @@ class CarsController {
             const _id = req.params.id;
             await CarsService.finishBids(_id);
             const result = await BidsService.getLastBidByCar(_id);
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi atualizado!' });
+                return;
+            };
+
             Helper.sendResponse(res, HttpStatus.OK, result);
         } catch (error) {
             this.handleError(res, error);
@@ -82,7 +111,13 @@ class CarsController {
     async delete(req: any, res: any): Promise<void> {
         try {
             const _id = req.params.id;
-            await CarsService.delete(_id);
+            const result = await CarsService.delete(_id);
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi deletado!' });
+                return;
+            };
+
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} deletado com Sucesso!`);
         } catch (error) {
             this.handleError(res, error);

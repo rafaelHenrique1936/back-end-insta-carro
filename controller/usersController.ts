@@ -6,7 +6,7 @@ import UsersService from "../services/usersService";
 const redis = new Redis();
 
 class UsersController {
-   
+
     async get(req: any, res: any): Promise<void> {
         try {
             const chave = `room:users`;
@@ -19,6 +19,12 @@ class UsersController {
                     Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
                 } else {
                     const result = await UsersService.get(page, limit);
+
+                    if (!result) {
+                        Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi encontrado!' });
+                        return;
+                    };
+
                     redis.set(chave, JSON.stringify(result));
                     redis.expire(chave, 10);
                     Helper.sendResponse(res, HttpStatus.OK, result);
@@ -39,6 +45,10 @@ class UsersController {
                     Helper.sendResponse(res, HttpStatus.OK, JSON.parse(reply));
                 } else {
                     const result = await UsersService.getById(_id);
+                    if (!result) {
+                        Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi encontrado!' });
+                        return;
+                    };
                     redis.set(chave, JSON.stringify(result));
                     redis.expire(chave, 10);
                     Helper.sendResponse(res, HttpStatus.OK, result);
@@ -53,7 +63,13 @@ class UsersController {
         try {
             const user = req.body;
             const result = await UsersService.create(user);
-            Helper.sendResponse(res, HttpStatus.OK, 'Registro incluído com Sucesso!');
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi criado!' });
+                return;
+            };
+
+            Helper.sendResponse(res, HttpStatus.CREATED, { body: result, message: 'Registro incluído com Sucesso!' });
         } catch (error) {
             this.handleError(res, error);
         }
@@ -64,7 +80,13 @@ class UsersController {
             const _id = req.params.id;
             const user = req.body;
             const result = await UsersService.update(_id, user);
-            Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} alterado com Sucesso!`);
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi atualizado!' });
+                return;
+            };
+
+            Helper.sendResponse(res, HttpStatus.OK, { body: result, message: `Registro ${_id} alterado com Sucesso!` });
         } catch (error) {
             this.handleError(res, error);
         }
@@ -73,7 +95,13 @@ class UsersController {
     async delete(req: any, res: any): Promise<void> {
         try {
             const _id = req.params.id;
-            await UsersService.delete(_id);
+            const result = await UsersService.delete(_id);
+
+            if (!result) {
+                Helper.sendResponse(res, HttpStatus.NOT_FOUND, { message: 'Nenhum registro foi atualizado!' });
+                return;
+            };
+            
             Helper.sendResponse(res, HttpStatus.OK, `Registro ${_id} deletado com Sucesso!`);
         } catch (error) {
             this.handleError(res, error);

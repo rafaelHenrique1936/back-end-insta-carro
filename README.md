@@ -2,6 +2,25 @@
 
 Este projeto é parte do Desafio Insta Carro, uma plataforma de leilão na qual carros estão cadastrados e os usuários podem fazer lances nos carros disponíveis na plataforma.
 
+## Estrutura do Diretório e Camadas da Aplicação
+
+Este projeto segue uma estrutura de diretório comumente usada em aplicações TypeScript/Node.js, com a divisão em camadas para melhor organização e separação de responsabilidades:
+
+- **Controllers**: Responsáveis por receber as requisições HTTP, chamar os serviços apropriados e enviar as respostas de volta ao cliente.
+  
+- **Services**: Encarregados de conter a lógica de negócios da aplicação, como manipulação de dados e interações com o banco de dados.
+
+- **Repository**: Responsáveis por interagir diretamente com a camada de persistência de dados, como o banco de dados ou qualquer outra fonte de dados externa.
+
+- **Models**: Definem as estruturas de dados utilizadas pela aplicação, representando entidades específicas ou objetos de domínio.
+
+- **program.ts**: Ponto de entrada da aplicação, onde é iniciado o servidor e configuradas as rotas da API.
+
+- **startUp.ts**: Responsável por configurar e inicializar a aplicação, definindo os serviços, repositórios e outros componentes necessários.
+
+Esta estrutura promove uma organização clara do código-fonte, facilitando a manutenção e a escalabilidade da aplicação.
+
+
 ## Bibliotecas Utilizadas
 
 ### Produção
