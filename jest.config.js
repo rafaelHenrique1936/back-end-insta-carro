@@ -1,9 +1,10 @@
-// jest.config.js
+
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
-    roots: ['<rootDir>/src'],
-    transform: {
-      '^.+\\.tsx?$': 'ts-jest',
-    },
-  };
+  preset: 'ts-jest',
+  testMatch: ["**/*.spec.ts"],
+  testEnvironment: 'node',
+  roots: ['<rootDir>/'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+};

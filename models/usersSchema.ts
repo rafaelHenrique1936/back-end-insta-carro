@@ -6,6 +6,6 @@ const usersSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phoneNumber: { type: String },
     active: { type: Boolean, required: true }
-})
+});
 
 export default usersSchema;

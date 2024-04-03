@@ -97,7 +97,7 @@ class BidsController {
             let message : String; 
 
             let result = await bidsService.create(bids);
-            message = result[0].message ? result[0].message : 'Registro incluído com Sucesso!';
+            message = result[0]?.message ? result[0]?.message : 'Registro incluído com Sucesso!';
             Helper.sendResponse(res, HttpStatus.OK, message);
 
         } catch (error) {
